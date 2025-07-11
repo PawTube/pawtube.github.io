@@ -86,14 +86,14 @@ footer {
 
 /* 🖱️ Custom Cursor */
 #custom-cursor {
+  width: 32px;
+  height: 32px;
+  background: url('../assets/paw-icon.svg') no-repeat center center;
+  background-size: contain;
+  pointer-events: none;
   position: fixed;
   top: 0;
   left: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: red;
-  pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%) rotate(0deg);
 }
