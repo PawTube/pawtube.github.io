@@ -2,117 +2,131 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>PawTube — Upload Video</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PawTube – Upload</title>
 
     <style>
-        body { background: #f1f1f1; margin: 0; font-family: Arial; }
-        .container {
-            width: 600px;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+        header {
+            background: #cc0000;
+            padding: 10px 15px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header img {
+            height: 34px;
         }
         input, textarea {
             width: 100%;
             padding: 10px;
-            margin-top: 8px;
-            border: 1px solid #aaa;
+            margin: 12px 0;
+            font-size: 16px;
         }
         button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 15px;
             background: #cc0000;
             color: white;
             border: none;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 17px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
-    <div id="nav-left">
-        <a href="index.html"><img src="Logo.png"></a>
-        <a href="index.html">Home</a>
-        <a href="upload.html">Upload</a>
-        <a href="channels.html">Channels</a>
-    </div>
-    <div id="nav-right">
-        <a id="loginBtn" href="auth.html">Login / Signup</a>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    <a href="index.html"><img src="Logo.png" alt="PawTube"></a>
+    <div>
+        <a href="index.html" style="color:white;margin-right:15px;">Home</a>
+        <a href="upload.html" style="color:white;margin-right:15px;">Upload</a>
+        <a href="channels.html" style="color:white;">Channels</a>
     </div>
 </header>
 
-<div class="container">
-    <h2>Upload Video (Embed)</h2>
+<h2>Upload Video</h2>
+<p>This site only accepts videos via embed codes.</p>
 
-    <input id="title" placeholder="Video Title">
-    <textarea id="description" placeholder="Description"></textarea>
-    <textarea id="embed" placeholder="Paste embed code here"></textarea>
+<label>Video Title</label>
+<input id="title" type="text">
 
-    <button onclick="uploadVideo()">Upload</button>
-</div>
+<label>Description</label>
+<textarea id="desc" rows="4"></textarea>
+
+<label>Embed Code (iframe)</label>
+<textarea id="embed" rows="4" placeholder='<iframe src="..."></iframe>'></textarea>
+
+<button id="uploadBtn">Publish</button>
+
+<p id="msg"></p>
 
 <script type="module">
-import { auth, db } from "./firebase.js";
-import {
-    signOut,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp }
+        from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-import {
-    addDoc,
-    collection,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+    // Your config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhtICW3CZ3xk2aE-LFUx_hDvmEMMfoHmc",
+        authDomain: "old--2005---2012.firebaseapp.com",
+        projectId: "old--2005---2012",
+        storageBucket: "old--2005---2012.firebasestorage.app",
+        messagingSenderId: "151747899362",
+        appId: "1:151747899362:web:50517fcdead38e2e57d3bb"
+    };
 
-// Logout
-window.logout = async () => {
-    await signOut(auth);
-    location.reload();
-};
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-// Show login/logout
-onAuthStateChanged(auth, user => {
-    if (user) {
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "block";
-    } else {
-        loginBtn.style.display = "block";
-        logoutBtn.style.display = "none";
-    }
-});
+    const uploadBtn = document.getElementById("uploadBtn");
+    const msg = document.getElementById("msg");
 
-// Upload function
-window.uploadVideo = async () => {
-    const user = auth.currentUser;
-    if (!user) return alert("Login first.");
+    let currentUser = null;
 
-    const title = document.getElementById("title").value;
-    const description = document.getElementById("description").value;
-    const embed = document.getElementById("embed").value;
-
-    if (!title || !embed) {
-        alert("Title and embed code are required.");
-        return;
-    }
-
-    await addDoc(collection(db, "videos"), {
-        title,
-        description,
-        embedCode: embed,
-        ownerUid: user.uid,
-        created: serverTimestamp(),
-        views: 0
+    onAuthStateChanged(auth, user => {
+        currentUser = user;
+        if (!user) {
+            msg.textContent = "You must be logged in to upload.";
+            uploadBtn.disabled = true;
+        }
     });
 
-    alert("Video uploaded.");
-    location.href = "index.html";
-};
+    uploadBtn.onclick = async () => {
+        const title = document.getElementById("title").value.trim();
+        const desc = document.getElementById("desc").value.trim();
+        const embed = document.getElementById("embed").value.trim();
+
+        if (!title || !embed) {
+            msg.textContent = "Title and embed code are required.";
+            return;
+        }
+
+        if (!currentUser) {
+            msg.textContent = "You must be logged in.";
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "videos"), {
+                title,
+                desc,
+                embed,
+                owner: currentUser.uid,
+                timestamp: serverTimestamp()
+            });
+
+            msg.textContent = "Uploaded successfully.";
+        } catch (err) {
+            msg.textContent = "Error: " + err.message;
+        }
+    };
 </script>
 
 </body>
