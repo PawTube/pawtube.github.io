@@ -1,11 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>PawTube</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #f1f1f1;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        header {
+            background: #cc0000;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header img {
+            height: 34px;
+            margin-right: 12px;
+        }
+
+        #nav-left a, #nav-right a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        #nav-left, #nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        #logoutBtn {
+            background: #990000;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 900px;
+            margin: 20px auto;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        .videoCard {
+            border-bottom: 1px solid #ddd;
+            padding: 12px 0;
+        }
+
+        .videoCard h3 {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
     <div id="nav-left">
         <a href="index.html">
@@ -22,31 +84,65 @@
     </div>
 </header>
 
+<!-- PAGE BODY -->
 <div class="container">
     <h2>Latest Videos</h2>
     <div id="feed"></div>
 </div>
 
+<!-- SCRIPTS -->
 <script type="module">
-import { db } from "./firebase.js";
-import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
+import {
+    signOut,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
+import {
+    collection,
+    getDocs,
+    orderBy,
+    query
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+
+// LOGIN / LOGOUT UI
+window.logout = async () => {
+    await signOut(auth);
+    location.reload();
+};
+
+onAuthStateChanged(auth, user => {
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (user) {
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+    } else {
+        loginBtn.style.display = "block";
+        logoutBtn.style.display = "none";
+    }
+});
+
+
+// LOAD VIDEO FEED
 async function loadVideos() {
     const q = query(collection(db, "videos"), orderBy("created", "desc"));
     const snap = await getDocs(q);
 
-    let feed = document.getElementById("feed");
+    const feed = document.getElementById("feed");
     feed.innerHTML = "";
 
     snap.forEach(doc => {
-        let v = doc.data();
+        const v = doc.data();
         feed.innerHTML += `
-        <div class="videoCard">
-            <a href="watch.html?id=${doc.id}">
-                ${v.embedThumb ? `<img src="${v.embedThumb}" width="200">` : ""}
-                <h3>${v.title}</h3>
-            </a>
-        </div>`;
+            <div class="videoCard">
+                <a href="watch.html?id=${doc.id}">
+                    <h3>${v.title}</h3>
+                </a>
+            </div>
+        `;
     });
 }
 
