@@ -1,164 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>PawTube Upload</title>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 30px;
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-        }
-        h1 {
-            margin-top: 0;
-        }
-        .section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            margin-bottom: 25px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-        .btn {
-            padding: 12px 20px;
-            background: #cc0000;
-            color: white;
-            display: inline-block;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        ul li {
-            margin-bottom: 8px;
-        }
-    </style>
-
-    <!-- Firebase -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } 
-            from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged }
-            from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        let currentUser = null;
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-        });
-
-        async function uploadVideo() {
-            const title = document.getElementById("title").value.trim();
-            const embed = document.getElementById("embed").value.trim();
-            const status = document.getElementById("status");
-
-            if (!currentUser) {
-                status.innerText = "You must be logged in.";
-                return;
-            }
-            if (!title || !embed) {
-                status.innerText = "Missing title or embed code.";
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "videos"), {
-                    title: title,
-                    embed: embed,
-                    uploader: currentUser.uid,
-                    timestamp: serverTimestamp()
-                });
-                status.innerText = "Upload Successful.";
-                document.getElementById("title").value = "";
-                document.getElementById("embed").value = "";
-            } catch (err) {
-                status.innerText = "Error: " + err.message;
-            }
-        }
-
-        window.uploadVideo = uploadVideo;
-    </script>
+<meta charset="UTF-8">
+<title>PawTube – Upload</title>
+<style>
+body { font-family: Arial; background:#f1f1f1; margin:0; padding:0; }
+header { background:#cc0000; color:white; padding:12px 15px; display:flex; align-items:center; }
+header img { height:34px; margin-right:12px; }
+form { max-width:600px; margin:30px auto; background:white; padding:20px; border:1px solid #ccc; border-radius:8px; }
+input, textarea { width:100%; margin-bottom:15px; padding:8px; }
+button { padding:10px 20px; background:#cc0000; color:white; border:none; cursor:pointer; }
+button:hover { background:#990000; }
+</style>
 </head>
-
 <body>
 
-<h1>Upload a Video</h1>
+<header>
+    <a href="index.html"><img src="Logo.png" alt="PawTube"></a>
+    Upload Video
+</header>
 
-<!-- Tutorial -->
-<div class="section">
-    <h2>How to Upload</h2>
-    <p>PawTube uses <strong>embed codes</strong>. You upload your video to Vimeo (or any embed-capable service), then paste the embed here.</p>
+<form id="uploadForm">
+    <label>Video Title:</label>
+    <input type="text" id="title" required>
 
-    <h3>Steps</h3>
-    <ol>
-        <li>Upload your video to Vimeo</li>
-        <li>Open the video and click “Share”</li>
-        <li>Copy the embed code (&lt;iframe…&gt;)</li>
-        <li>Paste it in the box below</li>
-        <li>Give your video a title</li>
-        <li>Press Upload</li>
-    </ol>
-</div>
+    <label>Video Embed Code:</label>
+    <textarea id="embed" required placeholder="Paste Vimeo or other embed code here"></textarea>
 
-<!-- Guidelines -->
-<div class="section">
-    <h2>Upload Guidelines</h2>
+    <label>Description (optional):</label>
+    <textarea id="desc" placeholder="Write a description"></textarea>
 
-    <ul>
-        <li>No spams</li>
-        <li>No 18+ videos (13+ is still fine)</li>
-        <li>If not for all ages but not 18+, add a disclaimer</li>
-        <li>The embed must be a real video</li>
-        <li>Do not break the website with bad embeds</li>
-        <li>No videos you don’t own unless you have permission and proof</li>
-        <li>No copyrighted content</li>
-        <li>Video must not be broken</li>
-        <li>No Free Robux or scam content</li>
-        <li>No exposing other people’s channels</li>
-        <li>Report violations: <strong>pixelpaw-coding@keemail.me</strong></li>
-    </ul>
+    <button type="submit">Upload</button>
+</form>
 
-    <p><strong>If you break guidelines:</strong><br>
-    Your video may be deleted. Repeated violations may result in account deletion.  
-    You will get an email if your video or account is removed.</p>
-</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-<!-- Upload Form -->
-<div class="section">
-    <h2>Submit Your Video</h2>
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyBhtICW3CZ3xk2aE-LFUx_hDvmEMMfoHmc",
+    authDomain: "old--2005---2012.firebaseapp.com",
+    projectId: "old--2005---2012",
+    storageBucket: "old--2005---2012.firebasestorage.app",
+    messagingSenderId: "151747899362",
+    appId: "1:151747899362:web:50517fcdead38e2e57d3bb"
+};
 
-    <label>Video Title</label>
-    <input id="title" type="text" placeholder="Title">
+// Init
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    <label>Embed Code</label>
-    <textarea id="embed" rows="6" placeholder="Paste Vimeo embed code"></textarea>
+const form = document.getElementById("uploadForm");
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const title = document.getElementById("title").value.trim();
+    const embed = document.getElementById("embed").value.trim();
+    const desc = document.getElementById("desc").value.trim();
 
-    <div class="btn" onclick="uploadVideo()">Upload</div>
-    <p id="status"></p>
-</div>
+    if (!title || !embed) {
+        alert("Title and embed code are required.");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "videos"), {
+            title,
+            embed,
+            desc,
+            timestamp: serverTimestamp()
+        });
+        alert("Upload successful!");
+        form.reset();
+    } catch (err) {
+        console.error(err);
+        alert("Upload failed. Check console for details.");
+    }
+});
+</script>
 
 </body>
 </html>
