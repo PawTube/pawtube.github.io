@@ -65,6 +65,13 @@
         padding: 15px;
         border: 1px solid #ccc;
     }
+    .video-link {
+        color: #cc0000;
+        text-decoration: none;
+    }
+    .video-link:hover {
+        text-decoration: underline;
+    }
 </style>
 </head>
 <body>
@@ -117,6 +124,11 @@ const db = getFirestore(app);
 
 const videoList = document.getElementById("videoList");
 
+// Encode embed for URL
+function encodeEmbed(embed) {
+    return encodeURIComponent(embed);
+}
+
 // Load videos
 async function loadVideos() {
     const q = query(collection(db, "videos"), orderBy("timestamp", "desc"));
@@ -126,10 +138,16 @@ async function loadVideos() {
 
     snap.forEach(doc => {
         const v = doc.data();
+        const encodedEmbed = encodeEmbed(v.embed);
+        const encodedTitle = encodeURIComponent(v.title);
 
         videoList.innerHTML += `
             <div class="video-box">
-                <h3>${v.title}</h3>
+                <h3>
+                    <a class="video-link" href="watch.html?embed=${encodedEmbed}&title=${encodedTitle}">
+                        ${v.title}
+                    </a>
+                </h3>
                 ${v.embed}
                 <p>${v.desc || ""}</p>
             </div>
