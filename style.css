@@ -1,24 +1,65 @@
+/* Old YouTube Theme */
 body {
-    font-family: Arial;
     background: #f1f1f1;
+    font-family: Arial, sans-serif;
     margin: 0;
 }
 
+/* Header */
 header {
     background: #cc0000;
-    padding: 12px;
     color: white;
-    font-size: 22px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+header img {
+    height: 34px;
+    margin-right: 12px;
+}
+
+#nav-left a, #nav-right a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+#nav-left, #nav-right {
+    display: flex;
+    align-items: center;
+}
+
+#logoutBtn {
+    background: #990000;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Home Video List */
 .container {
-    width: 800px;
-    margin: auto;
+    width: 900px;
+    margin: 20px auto;
     background: white;
+    border: 1px solid #ccc;
     padding: 20px;
 }
 
 .videoCard {
     border-bottom: 1px solid #ddd;
-    padding: 10px 0;
+    padding: 12px 0;
+}
+
+.videoCard h3 {
+    margin: 0;
+}
+
+.videoCard:hover {
+    background: #f7f7f7;
+    cursor: pointer;
 }
