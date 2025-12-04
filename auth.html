@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PawTube — Login</title>
+    <style>
+        body {
+            background: #f1f1f1;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        header {
+            background: #cc0000;
+            padding: 12px;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            width: 400px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border: 1px solid #ccc;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #aaa;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            font-size: 16px;
+        }
+        h2 {
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>PawTube</header>
+
+<div class="container">
+
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <h2>Create Account</h2>
+    <input type="email" id="signupEmail" placeholder="Email">
+    <input type="password" id="signupPassword" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+
+</div>
+
+<script type="module">
+    import { auth, db } from "./firebase.js";
+
+    import {
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+    import {
+        setDoc,
+        doc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+
+    // LOGIN
+    window.login = async () => {
+        const email = document.getElementById("loginEmail").value;
+        const pass  = document.getElementById("loginPassword").value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            location.href = "index.html";
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+
+    // SIGNUP
+    window.signup = async () => {
+        const email = document.getElementById("signupEmail").value;
+        const pass  = document.getElementById("signupPassword").value;
+
+        try {
+            const user = await createUserWithEmailAndPassword(auth, email, pass);
+
+            await setDoc(doc(db, "users", user.user.uid), {
+                created: serverTimestamp(),
+                channelName: email.split("@")[0]
+            });
+
+            alert("Account created");
+            location.href = "index.html";
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+</script>
+
+</body>
+</html>
