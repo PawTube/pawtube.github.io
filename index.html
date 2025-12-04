@@ -6,7 +6,21 @@
 </head>
 <body>
 
-<header>PawTube</header>
+<header>
+    <div id="nav-left">
+        <a href="index.html">
+            <img src="Logo.png" alt="PawTube">
+        </a>
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload</a>
+        <a href="channels.html">Channels</a>
+    </div>
+
+    <div id="nav-right">
+        <a id="loginBtn" href="auth.html">Login / Signup</a>
+        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    </div>
+</header>
 
 <div class="container">
     <h2>Latest Videos</h2>
