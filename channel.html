@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Channel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>PawTube</header>
+
+<div class="container">
+    <h2 id="name"></h2>
+    <div id="videos"></div>
+</div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import {
+    collection,
+    getDocs,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const uid = new URLSearchParams(location.search).get("uid");
+
+async function loadChannel() {
+    document.getElementById("name").innerText = uid;
+
+    const q = query(collection(db, "videos"), where("owner", "==", uid));
+    const snap = await getDocs(q);
+
+    let out = "";
+    snap.forEach(doc => {
+        let v = doc.data();
+        out += `<div class="videoCard"><a href="watch.html?id=${doc.id}">${v.title}</a></div>`;
+    });
+
+    document.getElementById("videos").innerHTML = out;
+}
+
+loadChannel();
+</script>
+
+</body>
+</html>
