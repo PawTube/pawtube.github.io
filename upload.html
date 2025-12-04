@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <title>PawTube – Upload</title>
 
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' https://www.gstatic.com https://www.googleapis.com 'unsafe-inline';
+               connect-src https://firestore.googleapis.com https://www.googleapis.com;
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               frame-src *;">
+
     <style>
         body {
             font-family: Arial;
