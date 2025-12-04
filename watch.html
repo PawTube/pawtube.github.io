@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Watch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header>PawTube</header>
+
+<div class="container">
+    <div id="video"></div>
+</div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const id = new URLSearchParams(location.search).get("id");
+
+async function loadVideo() {
+    const snap = await getDoc(doc(db, "videos", id));
+    const v = snap.data();
+
+    document.getElementById("video").innerHTML = `
+        <h2>${v.title}</h2>
+        ${v.embedCode}
+    `;
+}
+
+loadVideo();
+</script>
+
+</body>
+</html>
