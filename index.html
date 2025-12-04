@@ -1,37 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PawTube — YouTube but better</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="assets/Logo.png">
+<meta charset="UTF-8">
+<title>PawTube</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== RESET ===== */
+body, h1, h2, h3, p, ul { margin: 0; padding: 0; }
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f1f1;
+    color: #111;
+}
+
+/* ===== HEADER ===== */
+#header {
+    background: #c9c9c9;
+    border-bottom: 1px solid #aaa;
+    padding: 10px 0;
+}
+#header .wrap {
+    width: 960px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+#logo img {
+    height: 40px;
+    display: block;
+}
+
+/* Search bar */
+#search {
+    flex: 1;
+    display: flex;
+}
+#search input {
+    flex: 1;
+    padding: 7px;
+    border: 1px solid #999;
+}
+#search button {
+    padding: 7px 15px;
+    border: 1px solid #999;
+    background: #eee;
+    cursor: pointer;
+}
+
+/* Upload + Sign in */
+#user-actions a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: #00f;
+}
+
+/* ===== MAIN LAYOUT ===== */
+#main {
+    width: 960px;
+    margin: 20px auto;
+    display: flex;
+    gap: 20px;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+    width: 180px;
+}
+#sidebar h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+#sidebar ul {
+    list-style: none;
+}
+#sidebar li a {
+    text-decoration: none;
+    color: #00f;
+    display: block;
+    padding: 4px 0;
+}
+
+/* ===== VIDEO GRID ===== */
+#videos {
+    flex: 1;
+}
+.section-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+.video {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 7px;
+}
+.video img {
+    width: 100%;
+    display: block;
+}
+.video .title {
+    font-size: 14px;
+    margin-top: 5px;
+    color: #00f;
+}
+.video .meta {
+    font-size: 12px;
+    color: #555;
+}
+
+/* ===== FOOTER ===== */
+#footer {
+    text-align: center;
+    margin: 40px 0 20px;
+    font-size: 13px;
+    color: #555;
+}
+</style>
 </head>
 <body>
-  <div id="custom-cursor"></div>
 
-  <header>
-    <img src="assets/Logo.png" alt="PawTube Logo" class="logo">
-    <nav>
-      <a href="watch.html">Watch</a>
-      <a href="subscriptions.html">Subscriptions</a>
-      <a href="customize.html">Customize</a>
-    </nav>
-  </header>
+<!-- ===== HEADER ===== -->
+<div id="header">
+    <div class="wrap">
 
-  <main>
-    <h1>Welcome to <span class="highlight">PawTube</span> 🐾</h1>
-    <p>The better, customizable, ad-free video platform.</p>
-    <div class="buttons">
-      <a href="watch.html" class="button">Explore Videos</a>
-      <a href="subscriptions.html" class="button secondary">View Plans</a>
+        <!-- Your Logo.png -->
+        <div id="logo">
+            <img src="Logo.png" alt="PawTube">
+        </div>
+
+        <!-- Search bar -->
+        <div id="search">
+            <input type="text" id="searchBox" placeholder="Search videos…">
+            <button onclick="doSearch()">Search</button>
+        </div>
+
+        <!-- Right side links -->
+        <div id="user-actions">
+            <a href="#">Upload</a>
+            <a href="#">Sign In</a>
+        </div>
+
     </div>
-  </main>
+</div>
 
-  <footer>
-    &copy; 2025 PawTube Organization — All rights reserved.
-  </footer>
+<!-- ===== MAIN ===== -->
+<div id="main">
 
-  <script src="js/script.js"></script>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h3>Categories</h3>
+        <ul>
+            <li><a href="#">Music</a></li>
+            <li><a href="#">Gaming</a></li>
+            <li><a href="#">Comedy</a></li>
+            <li><a href="#">How-To</a></li>
+            <li><a href="#">News</a></li>
+        </ul>
+    </div>
+
+    <!-- Videos -->
+    <div id="videos">
+        <div class="section-title">Featured Videos</div>
+
+        <div class="video-grid">
+
+            <div class="video">
+                <img src="https://placehold.co/320x180" alt="">
+                <div class="title">Retro vibes test video</div>
+                <div class="meta">42K views · 1 day ago</div>
+            </div>
+
+            <div class="video">
+                <img src="https://placehold.co/320x180" alt="">
+                <div class="title">Another sample clip</div>
+                <div class="meta">9.2K views · 3 days ago</div>
+            </div>
+
+            <div class="video">
+                <img src="https://placehold.co/320x180" alt="">
+                <div class="title">Old-school PawTube demo</div>
+                <div class="meta">18K views · 5 hours ago</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div id="footer">
+    PawTube © 2025
+</div>
+
+<script>
+function doSearch() {
+    const q = document.getElementById("searchBox").value.trim();
+    if (q.length === 0) return;
+    alert("Search not implemented yet: " + q);
+}
+</script>
+
 </body>
 </html>
