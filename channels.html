@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PawTube — Channels</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div id="nav-left">
+        <a href="index.html"><img src="Logo.png"></a>
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload</a>
+        <a href="channels.html">Channels</a>
+    </div>
+    <div id="nav-right">
+        <a id="loginBtn" href="auth.html">Login / Signup</a>
+        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    </div>
+</header>
+
+<div class="container">
+    <h2>All Channels</h2>
+    <div id="channelList"></div>
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import {
+    signOut,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+import {
+    collection,
+    getDocs,
+    orderBy,
+    query
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+window.logout = async () => {
+    await signOut(auth);
+    location.reload();
+};
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+    } else {
+        loginBtn.style.display = "block";
+        logoutBtn.style.display = "none";
+    }
+});
+
+// Load channels sorted by subscribers
+async function loadChannels() {
+    const q = query(collection(db, "users"), orderBy("subscribers", "desc"));
+    const snap = await getDocs(q);
+
+    let html = "";
+
+    snap.forEach(doc => {
+        const u = doc.data();
+        html += `
+            <div class="videoCard">
+                <a href="channel.html?id=${doc.id}">
+                    <h3>${u.channelName} • ${u.subscribers} subscribers</h3>
+                </a>
+            </div>
+        `;
+    });
+
+    document.getElementById("channelList").innerHTML = html;
+}
+
+loadChannels();
+</script>
+</body>
+</html>
