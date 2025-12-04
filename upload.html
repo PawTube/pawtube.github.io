@@ -1,43 +1,117 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload</title>
+    <meta charset="UTF-8">
+    <title>PawTube — Upload Video</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        body { background: #f1f1f1; margin: 0; font-family: Arial; }
+        .container {
+            width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #aaa;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
 
-<header>PawTube Upload</header>
+<!-- HEADER -->
+<header>
+    <div id="nav-left">
+        <a href="index.html"><img src="Logo.png"></a>
+        <a href="index.html">Home</a>
+        <a href="upload.html">Upload</a>
+        <a href="channels.html">Channels</a>
+    </div>
+    <div id="nav-right">
+        <a id="loginBtn" href="auth.html">Login / Signup</a>
+        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    </div>
+</header>
 
 <div class="container">
-    <p id="authStatus"></p>
-    <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    <h2>Upload Video (Embed)</h2>
 
-    <h2>Upload Video</h2>
-
-    <input id="title" placeholder="Title"><br><br>
-    <textarea id="embed" placeholder="Paste video embed code"></textarea><br><br>
+    <input id="title" placeholder="Video Title">
+    <textarea id="description" placeholder="Description"></textarea>
+    <textarea id="embed" placeholder="Paste embed code here"></textarea>
 
     <button onclick="uploadVideo()">Upload</button>
 </div>
 
 <script type="module">
-import "./auth.js";
 import { auth, db } from "./firebase.js";
-import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import {
+    signOut,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
+import {
+    addDoc,
+    collection,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+// Logout
+window.logout = async () => {
+    await signOut(auth);
+    location.reload();
+};
+
+// Show login/logout
+onAuthStateChanged(auth, user => {
+    if (user) {
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+    } else {
+        loginBtn.style.display = "block";
+        logoutBtn.style.display = "none";
+    }
+});
+
+// Upload function
 window.uploadVideo = async () => {
     const user = auth.currentUser;
-    if (!user) return alert("Login required");
+    if (!user) return alert("Login first.");
+
+    const title = document.getElementById("title").value;
+    const description = document.getElementById("description").value;
+    const embed = document.getElementById("embed").value;
+
+    if (!title || !embed) {
+        alert("Title and embed code are required.");
+        return;
+    }
 
     await addDoc(collection(db, "videos"), {
-        owner: user.uid,
-        title: document.getElementById("title").value,
-        embedCode: document.getElementById("embed").value,
-        created: serverTimestamp()
+        title,
+        description,
+        embedCode: embed,
+        ownerUid: user.uid,
+        created: serverTimestamp(),
+        views: 0
     });
 
-    alert("Uploaded");
-    location.href = "/";
+    alert("Video uploaded.");
+    location.href = "index.html";
 };
 </script>
 
