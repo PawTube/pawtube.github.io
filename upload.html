@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>PawTube Upload</header>
+
+<div class="container">
+    <p id="authStatus"></p>
+    <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+
+    <h2>Upload Video</h2>
+
+    <input id="title" placeholder="Title"><br><br>
+    <textarea id="embed" placeholder="Paste video embed code"></textarea><br><br>
+
+    <button onclick="uploadVideo()">Upload</button>
+</div>
+
+<script type="module">
+import "./auth.js";
+import { auth, db } from "./firebase.js";
+import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+window.uploadVideo = async () => {
+    const user = auth.currentUser;
+    if (!user) return alert("Login required");
+
+    await addDoc(collection(db, "videos"), {
+        owner: user.uid,
+        title: document.getElementById("title").value,
+        embedCode: document.getElementById("embed").value,
+        created: serverTimestamp()
+    });
+
+    alert("Uploaded");
+    location.href = "/";
+};
+</script>
+
+</body>
+</html>
